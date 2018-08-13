@@ -1,20 +1,18 @@
-# Collect outputs
-
-#' Title
+#' Collect results files from BadiRate runs.
 #'
 #' @param setup_table Setup table created when `prepare_badirate_scripts()` was invited.
-#' @param out_dir Output directory to store result files. 
+#' @param out_dir Output directory to store result files.
 #'
 #' @return
 #' @export
 #'
 #' @examples
-badirate_collect <- function(setup_table, out_dir = "./results"){
-  
+bd_collect <- function(setup_table, out_dir = "./results"){
+
   if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-  
+
   cat("Collecting results. This may take a while...\n")
-  
+
   for (i in 1:nrow(setup_table)) {
     pb <- txtProgressBar(style = 3)
     cat("\nModel:", setup_table[i,]$model, "\n")
@@ -28,9 +26,7 @@ badirate_collect <- function(setup_table, out_dir = "./results"){
     }
     close(pb)
   }
-  
-  
-  
+
   cat("Done.")
 }
 
