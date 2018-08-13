@@ -12,8 +12,9 @@ bd_model_select <- function(setup_table, results_dir){
 dplyr::tibble(file_path = list.files(path = results_dir, pattern =  ".likelihood.txt")) %>%
     dplyr::mutate(model = file_path %>% stringr::str_sub(0,2),
          replicates = file_path %>% stringr::str_sub(3,4) %>% as.numeric()) %>%
-    dplyr::left_join(setup_table, by = "model") %>%
-    dplyr::mutate(data = file_path %>% purrr::map(function(x){paste(results_dir, x, sep = "") %>% readr::read_delim(col_names=FALSE, delim = " ") %>%  dplyr::select(X1, X3) %>% dplyr::rename(filename = X1, likelihood = X3)})) %>%
+    dplyr::left_join(setup_table %>% select(-replicates), by = "model") %>%
+    dplyr::mutate(data = file_path %>% purrr::map(function(x){paste(results_dir, "/", x, sep = "") %>%
+        readr::read_delim(col_names=c("filename", "nann", "likelihood"), delim = " ", col_types = cols(col_character(), col_character(), col_double()))})) %>%
     tidyr::unnest() %>%
     dplyr::mutate(og = filename %>% stringr::str_sub(-21, -13)) %>%
     dplyr::select(og, model, parameters, replicates, likelihood) %>%
@@ -29,7 +30,7 @@ dplyr::tibble(file_path = list.files(path = results_dir, pattern =  ".likelihood
            second_waic = sort(waic)[-2],
            waic_ratio = best_waic / second_waic) %>%
     dplyr::slice(which.max(waic)) %>%
-    dplyr::select(og, model, aic, waic, waic_ratio) %>%
+    dplyr::select(og, model, replicates, aic, waic, waic_ratio) %>%
     dplyr::mutate(signif = waic_ratio > 2.7) %>%
     return()
 

@@ -81,7 +81,7 @@ prepare_badirate <- function(og_path,
       for(i in 1:length(branch_models)) {
         readr::write_file(
           paste("#!/bin/bash\n#PBS -q ", pbs_q ,"\n#PBS -V\n#PBS -J 1-", replicates, "\n\n",
-              "### BadiRate script file for ", rate_model, "-", names(branch_models[i]), "-ML\n\n",
+              "### BadiRate script filec for ", rate_model, "-", names(branch_models[i]), "-ML\n\n",
               "cd ", og_path, "\n\n",
               "mkdir ", out_dir, "/", names(branch_models[i]), "\n\n",
               "for file in ./*\ndo\n\n",

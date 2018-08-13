@@ -18,7 +18,7 @@ bd_collect <- function(setup_table, out_dir = "./results"){
     cat("\nModel:", setup_table[i,]$model, "\n")
     for (j in 1:setup_table[i,]$replicates) {
       in_length = 30 + setup_table[1,]$tree_size
-      system(paste0("awk 'FNR==23,FNR==", 22 + tree_branches, " {print FILENAME, $0}' ", setup_table[i,]$path, "/*", setup_table[i,]$model, "`printf '%02d' ", j, "`.bd > ", out_dir, "/", setup_table[i,]$model, "`printf '%02d' ", j, "`.branch_code.txt"))
+      system(paste0("awk 'FNR==23,FNR==", 22 + setup_table[1,]$tree_size, " {print FILENAME, $0}' ", setup_table[i,]$path, "/*", setup_table[i,]$model, "`printf '%02d' ", j, "`*.bd > ", out_dir, "/", setup_table[i,]$model, "`printf '%02d' ", j, "`.branch_code.txt"))
       system(paste0("awk 'FNR==", in_length, " {print FILENAME, $0}' ", setup_table[i,]$path, "/*", setup_table[i,]$model, "`printf '%02d' ", j, "`.bd > ", out_dir, "/", setup_table[i,]$model, "`printf '%02d' ", j, "`.likelihood.txt"))
       system(paste0("awk 'FNR==", in_length + 2, ",FNR==", in_length + 1 + setup_table[i,]$parameters/2," {print FILENAME, $0}' ", setup_table[i,]$path, "/*", setup_table[i,]$model, "`printf '%02d' ", j, "`.bd > ", out_dir, "/", setup_table[i,]$model, "`printf '%02d' ", j, "`.parameters.txt"))
       system(paste0("awk 'FNR==",in_length + 10 + setup_table[i,]$parameters/2, ",FNR==", in_length + 9 + setup_table[i,]$parameters/2 + setup_table[1,]$tree_size," {print FILENAME, $0}' ", setup_table[i,]$path, "/*", setup_table[i,]$model, "`printf '%02d' ", j, "`.bd > ", out_dir, "/", setup_table[i,]$model, "`printf '%02d' ", j, "`.gains.txt"))

@@ -12,4 +12,5 @@ LazyData: true
 Imports: dplyr,
     readr,
     stringr,
-    purrr
+    purrr,
+    tidyr
