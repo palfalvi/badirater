@@ -1,0 +1,315 @@
+---
+title: "Introduction to `badirater`"
+author: 
+  - name: Gergo Palfalvi
+    affiliation: National Institute for Basic Biology, Japan
+    email: palfalvi.gergo@gmail.com
+package: badirater 0.0.0.9000
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}  
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+```
+
+# What is `badirater`?
+
+## Overview
+
+`badirater` is an R package developed to make genomic studies easier using family turnover rate estimations with [`BadiRate`](http://www.ub.edu/softevol/badirate/). It enables genome wide studies along phylogenetic trees from within R, including data preparation, help for execution and downstream processing.
+
+## How BadiRate works in whole genome level studies?
+
+[`BadiRate`](http://www.ub.edu/softevol/badirate/) is a versatile program which enables family turnover rate analysis, including gene family expansion and collapsion detections, however it's structure and style makes it difficult to work with in large-scale studies. 
+
+Standard method includes at least one run per family/orthogroup (og). This will be expanded by comparison of different branch models and technical replicates. Formerly is necessary to infer model estimation accuracy, later is to avoid local maxima detection instead of global one. If we consider only 3 replications with 3 different models on ~10.000 gene families, it is clear that we should run BadiRate ~90.000 times. This can be a reason for the inexperienced users to leave the program and look for similar, but less versatile ones. 
+
+`badirater` enables to automate the whole process, including data preprocessing, batch run preparation, data collection and tidying and downstream calculations and processes. 
+
+# Installation
+
+
+
+# Requirements
+
+## Operating system
+
+`badirater` uses reguler UNIX features, e.g. `awk`, hence it is required to be used on UNIX based systems. Since BadiRate is a perl program and we expect batch processing, it is recommended to process on an available cluster computer with Torque/PBS or SLURM.
+
+## Required programs
+
+To run `badirater`, the following programs should be installed:
+
+- [`BadiRate`](http://www.ub.edu/softevol/badirate/)
+
+## Input files
+
+There are just two input files are required:
+
+- Gene family sizes: either direct output from `orthofinder` (Orthogroups.GeneCount.csv) or a similarly formatted file.
+- Ultrametric species tree
+
+Also you have to consider the branch models you would like to test. Regularly we run at least three different models: a global rate, a free rate and a species-specific rate model:
+
+- Global rate (GR): All branches have the same turnover rate
+- Free rate (FR): All branches have independent turnover rates
+- Branch specific (BR): The user supplies which branches are grouped as common turnover rate (see BadiRate documentation for further explanation) 
+
+
+## Preparing for BadiRate run 
+
+First let's arrange our working directory as follows: 
+
+```
+- badirate_analysis/
+  |- Orthogroups.GeneCount.csv
+  |- SpeciesTree.Ultrametric.tree
+```  
+
+### Splitting family size file
+
+Since we would like to run BadiRate by gene family/orthogroup, we should split the files into individual components. All the new files will be stored in one directory. 
+
+```{r, eval = FALSE}
+
+setwd("../test/badirate_analysis")
+
+split_orthogroups("Orthogroups.GeneCount.csv", max_count = 40, og_path = "./badirate_orthogroups")
+
+```
+
+This created the following:
+
+```
+- badirate_analysis/
+  |- badirate_orthogroups/
+      |- OGxxxxxx.txt
+      |- ...
+      |- OGyyyyyy.txt
+  |- Orthogroups.GeneCount.csv
+  |- SpeciesTree.Ultrametric.tree
+``` 
+
+### Creating job scripts and setup table
+
+Now we have all the family files prepared, we can set up the experiment for BadiRate. Create the branch models object you would like to select, and set up the script files. 
+
+```{r, eval = FALSE}
+
+bd_path = "~/bin/badirate-1.35/"
+
+branch_numbers(tree = "SpeciesTree.Ultrametric.tree",
+               og = "Orthogroups.GeneCount.csv",
+               badirate_path = bd_path,
+               plot = TRUE,
+               tree_file = "./branch_ids.tree")
+```
+
+Now we see the branch numbering and can describe branch models. Important, that each branch model should have an exactly 2-letter long unique name. In this case, we prepare 4 models, one global rate and one free rate model and 2 branch specific ones (`sp` and `fm`), both with one group and background.
+
+```{r, eval = FALSE}
+branch_models = c(
+  "gr" = "GR",
+  "fr" = "FR",
+  "sp" = "15->16",
+  "fm" = "14->15:15->16:15->17"
+)
+```
+
+As we decided our models and every files are ready, we can prepare the running scripts. Don't forget to save the output of the `prepare_badirate()` for future use. If you forgot, still you can rerun with `create_scripts = "none"` option.
+
+```{r, eval = FALSE}
+setup_table <- prepare_badirate(og_path = "./badirate_orthogroups/",
+                                tree = "SpeciesTree.Ultrametric.tree",
+                                branch_models = branch_models,
+                                rate_model = "GD",
+                                out_dir = "./raw_outputs",
+                                script_dir = "./scripts",
+                                replicates = 2,
+                                ancestral = TRUE,
+                                outlier = TRUE,
+                                seed = 20180808,
+                                start_value = 1,
+                                pbs_q = "smps",
+                                badirate_path = bd_path,
+                                create_scripts = "pbs")
+
+
+setup_table
+```
+
+
+Don't forget to save the `setup_table` object!
+
+```{r, eval = FALSE}
+readr::write_csv(setup_table, "./setup_table.csv")
+```
+
+
+Now our working directory should look like this:
+
+```
+- badirate_analysis/
+  |- raw_outputs/
+  |- scripts/
+      |- badi_gr_script.pbs
+      |- badi_fr_script.pbs
+      |- badi_sp_script.pbs
+      |- badi_fm_script.pbs
+  |- badirate_orthogroups/
+      |- OGxxxxxx.txt
+      |- ...
+      |- OGyyyyyy.txt
+  |- setup_table.csv
+  |- Orthogroups.GeneCount.csv
+  |- SpeciesTree.Ultrametric.tree
+```
+
+## Running BadiRate jobs
+
+There are several ways you can run the created jobs in the `./scripts` directory. If your system has available PBS or SLURM, you could create ready-to-run scripts with `preapre_badirate()`, otherwise you can use those scripts as a starting point and run in your command line directly [^footnote].
+
+
+[^footnote]:  Too complex or too many jobs can run for days. Be careful to save everything if you leave the computer.
+  
+
+In `badirater` there are some built in function to be able to submit and monitor PBS and SLURM jobs without leaving R.
+
+### PBS/Torque
+
+To submit jobs, use `qsub()` with a file or filelist. You can monitor the run with `qstat()` or `qstat("-Jt"")`
+
+```{r, eval = FALSE}
+scripts <- dir(path = "./scripts")
+
+qsub(scripts)
+
+qstat()
+```
+
+### SLURM
+
+To submit jobs, use `sbatch()` with a file or filelist. You can monitor the run with `squeue()`.
+
+```{r, eval = FALSE}
+scripts <- dir(path = "./scripts")
+
+sbatch(scripts)
+
+squeue()
+```
+
+
+## Collecting outputs
+
+After all the jobs finished, it is time to collect the important data from each files in the `./raw_outputs` directory.
+
+```
+- badirate_analysis/
+  |- raw_outputs/
+      |- gr/
+          |- OGxxxxxx.txt.gr01.bd
+          |- ...
+      |- fr/
+          |- OGxxxxxx.txt.fr01.bd
+          |- ...
+      |- ...
+  |- scripts/
+      |- badi_gr_script.pbs
+      |- badi_fr_script.pbs
+      |- badi_sp_script.pbs
+      |- badi_fm_script.pbs
+  |- badirate_orthogroups/
+      |- OGxxxxxx.txt
+      |- ...
+      |- OGyyyyyy.txt
+  |- setup_table.csv
+  |- Orthogroups.GeneCount.csv
+  |- SpeciesTree.Ultrametric.tree
+```
+
+Use the `bd_collect()` function for automatic collection. It may take a while, depending on the volume of the experiment.
+
+This will collect 4 files in each branch model - replication group:
+
+- `nnXX.branch_code.txt`: Branch decodings 
+- `nnXX.likelihood.txt`: Likelihood values for each families/orthogroups
+- `nnXX.parameters.txt`: Calculated turnover rates
+- `nnXX.gains.txt`: Minimum gain and loss information per branch
+
+
+```{r, eval = FALSE}
+
+setup_table <- readr::write_csv("./setup_table.csv")
+
+bd_collect(setup_table, out_dir = "./results")
+
+```
+
+
+```
+- badirate_analysis/
+  |- results/
+      |- grXX.branch_code.txt
+      |- grXX.likelihood.txt
+      |- grXX.parameters.txt
+      |- grXX.gains.txt
+      |- ...
+  |- raw_outputs/
+      |- gr/
+          |- OGxxxxxx.txt.gr01.bd
+          |- ...
+      |- fr/
+          |- OGxxxxxx.txt.fr01.bd
+          |- ...
+      |- ...
+  |- scripts/
+      |- badi_gr_script.pbs
+      |- badi_fr_script.pbs
+      |- badi_sp_script.pbs
+      |- badi_fm_script.pbs
+  |- badirate_orthogroups/
+      |- OGxxxxxx.txt
+      |- ...
+      |- OGyyyyyy.txt
+  |- setup_table.csv
+  |- Orthogroups.GeneCount.csv
+  |- SpeciesTree.Ultrametric.tree
+```
+
+## Model selection and gain/loss estimates
+
+### Selecting best models and testing its significance
+
+Here we use AIC (Akaike Information Criteria) to select the best replicates per model per family and wAIC (weighted AIC) to select the best models per orthogroup and assest the model significance.
+
+```{r, eval = FALSE}
+
+best_models <- bd_model_select(setup_table = setup_table, 
+                               results_dir = "./results")
+
+
+best_models
+```
+
+The output is tibble with one line per family, with the selected best model, its AIC and wAIC number, and its wAIC ratio to the second best model (it is accepted as significant if wAIC ratio is greater then 2.7, which means log(2.7) = 0.99325 is the probability that we selected a more valid model). This is corresponding to the `signif` column.
+
+### Parsing gain/loss events
+
+We can parse gain/loss events for each orthogroup from the best models.
+
+```{r}
+bd_extract_gain(best_models = best_models, results_dir = "./results")
+
+bd_extract_gain
+```
+
+Now we have most of the information on significant gain/loss events. 
+
+
+
+

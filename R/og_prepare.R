@@ -70,18 +70,19 @@ prepare_badirate <- function(og_path,
                                      start_value = 1,
                                      pbs_q = "smps",
                                      badirate_path = "",
-                                     create_scripts = TRUE) {
+                                     create_scripts = "pbs") {
 
-  if (create_scripts) {
+  if (create_scripts == "pbs") {
       if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
       if (!dir.exists(script_dir)) dir.create(script_dir, recursive = TRUE)
 
       cat("Creating ", length(branch_models), " different scripts with ", replicates, " replications inside.", sep = "")
 
       for(i in 1:length(branch_models)) {
+        ## PBS specific output
         readr::write_file(
           paste("#!/bin/bash\n#PBS -q ", pbs_q ,"\n#PBS -V\n#PBS -J 1-", replicates, "\n\n",
-              "### BadiRate script filec for ", rate_model, "-", names(branch_models[i]), "-ML\n\n",
+              "### BadiRate script file for ", rate_model, "-", names(branch_models[i]), "-ML\n\n",
               "cd ", og_path, "\n\n",
               "mkdir ", out_dir, "/", names(branch_models[i]), "\n\n",
               "for file in ./*\ndo\n\n",
@@ -100,8 +101,41 @@ prepare_badirate <- function(og_path,
         )
       }
       cat("\nDone.")
+  } else if (create_scripts == "slurm") {
+    ## SLURM specific output
+    if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+    if (!dir.exists(script_dir)) dir.create(script_dir, recursive = TRUE)
+
+    cat("Creating ", length(branch_models), " different scripts with ", replicates, " replications inside.", sep = "")
+
+    for(i in 1:length(branch_models)) {
+      readr::write_file(
+        paste("#!/bin/bash\n#SBATCH --export=all\n#SBATCH --array=1-", replicates, "\n\n",
+              "### BadiRate script file for ", rate_model, "-", names(branch_models[i]), "-ML\n\n",
+              "cd ", og_path, "\n\n",
+              "mkdir ", out_dir, "/", names(branch_models[i]), "\n\n",
+              "for file in ./*\ndo\n\n",
+              "\tperl ", badirate_path, "BadiRate.pl",
+              " -seed ", seed,
+              " -start_val ", start_value,
+              " -rmodel ", rate_model,
+              " -bmodel ", branch_models[[i]],
+              " -treefile ", tree,
+              " -sizefile ./${file}",
+              if_else(ancestral, " -anc", ""),
+              if_else(outlier, " -outlier", ""),
+              " -out ", out_dir, "/", names(branch_models[i]), "/${file}.gr`printf '%02d' ${SLURM_ARRAY_TASK_ID}`.bd", "\n\n",
+              "done",sep = ""),
+        paste(script_dir, "/badi_", names(branch_models[i]), "_script.slurm", sep = "")
+      )
+    }
+    cat("\nDone.")
+  } else if (create_scripts == "none") {
+    cat("No scripts will be created\n")
+  } else {
+    return("Inapropriate `create script` argument. Should be one of 'pbs', 'slurm' or 'none'")
   }
-  cat("\nPreparing data table.")
+  cat("\nPreparing data table.\n")
 
   tree_branches = readr::read_file(tree) %>% stringr::str_count(":")
 
@@ -144,5 +178,33 @@ qsub <- function(files, ...) {
 #' @examples
 qstat <- function(...) {
   system(paste("qstat -u ", Sys.info()[["user"]], " ",sep = "", ...))
+}
+
+
+#' Wrapper to sbatch command
+#'
+#' @param files Script files to be submitted.
+#' @param ... Other options to be passed to `sbatch`.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sbatch <- function(files, ...) {
+  for (i in 1:length(files)){
+    system(paste("sbatch ", ..., " ", files[i], sep = ""))
+  }
+}
+
+#' Wrapper to queue command
+#'
+#' @param ... Other options to be passed to `squeue`.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+squeue <- function(...) {
+  system(paste("squeue -u ", Sys.info()[["user"]], " ",sep = "", ...))
 }
 
