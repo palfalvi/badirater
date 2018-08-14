@@ -14,7 +14,8 @@ Imports: dplyr,
     stringr,
     purrr,
     tidyr,
-    treeio
+    treeio,
+    ape
 Suggests: BiocStyle,
     knitr,
     rmarkdown

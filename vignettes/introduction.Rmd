@@ -30,9 +30,6 @@ Standard method includes at least one run per family/orthogroup (og). This will 
 
 `badirater` enables to automate the whole process, including data preprocessing, batch run preparation, data collection and tidying and downstream calculations and processes. 
 
-# Installation
-
-
 
 # Requirements
 
@@ -59,8 +56,14 @@ Also you have to consider the branch models you would like to test. Regularly we
 - Free rate (FR): All branches have independent turnover rates
 - Branch specific (BR): The user supplies which branches are grouped as common turnover rate (see BadiRate documentation for further explanation) 
 
+# Installation
 
-## Preparing for BadiRate run 
+```{r, eval = FALSE}
+# install.packages('devtools')
+devtools::install_github("palfalvi/badirater")
+```
+
+# Preparing for BadiRate run 
 
 First let's arrange our working directory as follows: 
 
@@ -70,7 +73,7 @@ First let's arrange our working directory as follows:
   |- SpeciesTree.Ultrametric.tree
 ```  
 
-### Splitting family size file
+## Splitting family size file
 
 Since we would like to run BadiRate by gene family/orthogroup, we should split the files into individual components. All the new files will be stored in one directory. 
 
@@ -94,7 +97,7 @@ This created the following:
   |- SpeciesTree.Ultrametric.tree
 ``` 
 
-### Creating job scripts and setup table
+## Creating job scripts and setup table
 
 Now we have all the family files prepared, we can set up the experiment for BadiRate. Create the branch models object you would like to select, and set up the script files. 
 
@@ -169,7 +172,7 @@ Now our working directory should look like this:
   |- SpeciesTree.Ultrametric.tree
 ```
 
-## Running BadiRate jobs
+# Running BadiRate jobs
 
 There are several ways you can run the created jobs in the `./scripts` directory. If your system has available PBS or SLURM, you could create ready-to-run scripts with `preapre_badirate()`, otherwise you can use those scripts as a starting point and run in your command line directly [^footnote].
 
@@ -179,7 +182,7 @@ There are several ways you can run the created jobs in the `./scripts` directory
 
 In `badirater` there are some built in function to be able to submit and monitor PBS and SLURM jobs without leaving R.
 
-### PBS/Torque
+## PBS/Torque
 
 To submit jobs, use `qsub()` with a file or filelist. You can monitor the run with `qstat()` or `qstat("-Jt"")`
 
@@ -191,7 +194,7 @@ qsub(scripts)
 qstat()
 ```
 
-### SLURM
+## SLURM
 
 To submit jobs, use `sbatch()` with a file or filelist. You can monitor the run with `squeue()`.
 
@@ -204,7 +207,7 @@ squeue()
 ```
 
 
-## Collecting outputs
+# Collecting outputs
 
 After all the jobs finished, it is time to collect the important data from each files in the `./raw_outputs` directory.
 
@@ -281,9 +284,13 @@ bd_collect(setup_table, out_dir = "./results")
   |- SpeciesTree.Ultrametric.tree
 ```
 
-## Model selection and gain/loss estimates
+# Model selection and gain/loss estimates
 
-### Selecting best models and testing its significance
+```{r, eval = FALSE}
+dir.create("./analysis")
+```
+
+## Selecting best models and testing its significance
 
 Here we use AIC (Akaike Information Criteria) to select the best replicates per model per family and wAIC (weighted AIC) to select the best models per orthogroup and assest the model significance.
 
@@ -293,22 +300,26 @@ best_models <- bd_model_select(setup_table = setup_table,
                                results_dir = "./results")
 
 
+readr::write_csv(best_models, "")
+
 best_models
 ```
 
 The output is tibble with one line per family, with the selected best model, its AIC and wAIC number, and its wAIC ratio to the second best model (it is accepted as significant if wAIC ratio is greater then 2.7, which means log(2.7) = 0.99325 is the probability that we selected a more valid model). This is corresponding to the `signif` column.
 
-### Parsing gain/loss events
+## Parsing gain/loss events
 
 We can parse gain/loss events for each orthogroup from the best models.
 
-```{r}
+```{r, eval = FALSE}
 bd_extract_gain(best_models = best_models, results_dir = "./results")
 
 bd_extract_gain
 ```
 
 Now we have most of the information on significant gain/loss events. 
+
+How to decode?
 
 
 
