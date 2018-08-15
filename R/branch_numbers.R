@@ -10,6 +10,7 @@
 #'
 #' @importFrom treeio read.newick
 #' @importFrom readr write_file
+#' @importFrom datasets trees
 #' @export
 #'
 #' @examples

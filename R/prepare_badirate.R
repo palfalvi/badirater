@@ -23,6 +23,8 @@
 #' @importFrom stringr str_count
 #' @importFrom readr write_file
 #' @importFrom readr read_file
+#' @importFrom utils setTxtProgressBar
+#' @importFrom utils txtProgressBar
 #' @export
 #'
 #' @examples

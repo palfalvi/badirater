@@ -9,6 +9,8 @@
 #' @import dplyr
 #' @importFrom readr read_tsv
 #' @importFrom readr write_tsv
+#' @importFrom utils setTxtProgressBar
+#' @importFrom utils txtProgressBar
 #' @export
 #'
 #' @examples

@@ -10,6 +10,7 @@
 #' @importFrom purrr map_chr
 #' @importFrom stringr str_remove_all
 #' @importFrom treeio read.newick
+#' @importFrom datasets trees
 #' @export
 #'
 #' @examples
