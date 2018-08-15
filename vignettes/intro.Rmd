@@ -4,6 +4,7 @@ author:
   - name: Gergo Palfalvi
     affiliation: National Institute for Basic Biology, Japan
     email: palfalvi.gergo@gmail.com
+date: "`r Sys.Date()`"
 package: badirater 0.0.0.9000
 output:
   BiocStyle::html_document:

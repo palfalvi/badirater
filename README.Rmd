@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 
 [![Travis-CI Build Status](https://travis-ci.org/palfalvi/badirater.svg?branch=master)](https://travis-ci.org/palfalvi/badirater)
+[![codecov](https://codecov.io/gh/palfalvi/badirater/branch/master/graph/badge.svg)](https://codecov.io/gh/palfalvi/badirater)
 
 ***
 
