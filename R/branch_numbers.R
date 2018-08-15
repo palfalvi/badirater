@@ -9,7 +9,7 @@
 #' @return Either a plot or text of a labeled phylogenetic tree.
 #'
 #' @importFrom treeio read.newick
-#' readr write_file
+#' @importFrom readr write_file
 #' @export
 #'
 #' @examples

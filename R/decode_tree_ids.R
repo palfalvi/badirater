@@ -8,7 +8,7 @@
 #' @importFrom stringr str_split
 #' @importFrom ape subtrees
 #' @importFrom purrr map_chr
-#' @importFrom str_remove_all
+#' @importFrom stringr str_remove_all
 #' @importFrom treeio read.newick
 #' @export
 #'
