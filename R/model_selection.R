@@ -4,6 +4,12 @@
 #' @param results_dir Directory where results was saved with `bd_collect()`.
 #'
 #' @return A tibble with one selected model per orthogroup, including calculated values, like AIC, wAIC, wAIC ratio.
+#'
+#' @import dplyr
+#' @importFrom tidyr unnest
+#' @importFrom stringr str_sub
+#' @importFrom purrr map
+#' @importFrom readr read_delim
 #' @export
 #'
 #' @examples

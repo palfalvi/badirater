@@ -16,6 +16,13 @@
 #' @param create_scripts  Logical. Create pbs job scripts if TRUE, which is the default.
 #'
 #' @return Set up table of experimetns. Also writes out script files.
+#'
+#' @import dplyr
+#' @importFrom stringr str_sub
+#' @importFrom stringr str_length
+#' @importFrom stringr str_count
+#' @importFrom readr write_file
+#' @importFrom readr read_file
 #' @export
 #'
 #' @examples

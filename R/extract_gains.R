@@ -4,13 +4,19 @@
 #' @param results_dir Directory where results was saved with `bd_collect()`.
 #'
 #' @return A dataframe with (orthogroups * branches) rows and 10 columns.
+#'
+#' @import dplyr
+#' @importFrom stringr str_sub
+#' @importFrom readr read_delim
+#' @importFrom purrr map
+#' @importFrom tidyr unnest
 #' @export
 #'
 #' @examples
 bd_extract_gain <- function(best_models, results_dir = "./results") {
 
   best_models %>%
-    left_join(
+    dplyr::left_join(
       dplyr::tibble(file_path = list.files(path = results_dir, pattern =  ".gains.txt")) %>%
         dplyr::mutate(model = file_path %>% stringr::str_sub(0,2),
                       replicates = file_path %>% stringr::str_sub(3,4) %>% as.numeric()) %>%
@@ -22,7 +28,7 @@ bd_extract_gain <- function(best_models, results_dir = "./results") {
         tidyr::unnest() %>%
         dplyr::mutate(og = filename %>% str_sub(-21,-13)),
        by = c("og", "model", "replicates"))%>%
-    select(-file_path, -filename) %>%
+    dplyr::select(-file_path, -filename) %>%
     return()
 
 }
