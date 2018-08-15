@@ -26,3 +26,6 @@ knitr::opts_chunk$set(
 devtools::install_github("palfalvi/badirater")
 ```
 
+## Usage
+
+For detailed usage please refer to the `vignettes` page. 

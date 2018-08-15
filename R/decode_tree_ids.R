@@ -1,4 +1,4 @@
-bd_decode_tree_ids(tree_id){
+bd_decode_tree_ids <- function(tree_id){
   tree <- treeio::read.newick(tree_id)
 
   dplyr::bind_rows(
