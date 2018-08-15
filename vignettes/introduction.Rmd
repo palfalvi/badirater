@@ -5,13 +5,16 @@ author:
     affiliation: National Institute for Basic Biology, Japan
     email: palfalvi.gergo@gmail.com
 package: badirater 0.0.0.9000
-output: BiocStyle::html_document
+output:
+  BiocStyle::html_document:
+    toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Family turnover rate analysis with badirater}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}  
 ---
 
+  
 ```{r style, echo = FALSE, results = 'asis'}
 BiocStyle::markdown()
 ```
@@ -78,10 +81,11 @@ First let's arrange our working directory as follows:
 Since we would like to run BadiRate by gene family/orthogroup, we should split the files into individual components. All the new files will be stored in one directory. 
 
 ```{r, eval = FALSE}
+library(badirater)
 
-setwd("../test/badirate_analysis")
+setwd("../test/")
 
-split_orthogroups("Orthogroups.GeneCount.csv", max_count = 40, og_path = "./badirate_orthogroups")
+split_orthogroups("../test/obp_sub.12sp.tsv", max_count = 40, og_path = "../test/badirate_orthogroups")
 
 ```
 
@@ -101,15 +105,17 @@ This created the following:
 
 Now we have all the family files prepared, we can set up the experiment for BadiRate. Create the branch models object you would like to select, and set up the script files. 
 
+perl BadiRate.pl –treefile examples/droso.6sp.tamura.nwk –sizefile examples/obp_all.12sp.tsv –anc
+
 ```{r, eval = FALSE}
 
-bd_path = "~/bin/badirate-1.35/"
+bd_path = "/Users/gergo/Downloads/badirate-1.35/"
 
-branch_numbers(tree = "SpeciesTree.Ultrametric.tree",
-               og = "Orthogroups.GeneCount.csv",
+branch_numbers(tree = "../test/droso.12sp.tamura.nwk",
+               og = "../test/obp_sub.12sp.tsv",
                badirate_path = bd_path,
                plot = TRUE,
-               tree_file = "./branch_ids.tree")
+               tree_file = "../test/branch_ids.tree")
 ```
 
 Now we see the branch numbering and can describe branch models. Important, that each branch model should have an exactly 2-letter long unique name. In this case, we prepare 4 models, one global rate and one free rate model and 2 branch specific ones (`sp` and `fm`), both with one group and background.
@@ -117,9 +123,7 @@ Now we see the branch numbering and can describe branch models. Important, that 
 ```{r, eval = FALSE}
 branch_models = c(
   "gr" = "GR",
-  "fr" = "FR",
-  "sp" = "15->16",
-  "fm" = "14->15:15->16:15->17"
+  "sp" = "22->21"
 )
 ```
 
@@ -127,7 +131,7 @@ As we decided our models and every files are ready, we can prepare the running s
 
 ```{r, eval = FALSE}
 setup_table <- prepare_badirate(og_path = "./badirate_orthogroups/",
-                                tree = "SpeciesTree.Ultrametric.tree",
+                                tree = "./droso.12sp.tamura.nwk",
                                 branch_models = branch_models,
                                 rate_model = "GD",
                                 out_dir = "./raw_outputs",
@@ -137,7 +141,7 @@ setup_table <- prepare_badirate(og_path = "./badirate_orthogroups/",
                                 outlier = TRUE,
                                 seed = 20180808,
                                 start_value = 1,
-                                pbs_q = "smps",
+                                pbs_q = "small",
                                 badirate_path = bd_path,
                                 create_scripts = "pbs")
 
@@ -187,7 +191,7 @@ In `badirater` there are some built in function to be able to submit and monitor
 To submit jobs, use `qsub()` with a file or filelist. You can monitor the run with `qstat()` or `qstat("-Jt"")`
 
 ```{r, eval = FALSE}
-scripts <- dir(path = "./scripts")
+scripts <- dir(path = "./scripts", full.names = TRUE)
 
 qsub(scripts)
 
@@ -209,7 +213,7 @@ squeue()
 
 # Collecting outputs
 
-After all the jobs finished, it is time to collect the important data from each files in the `./raw_outputs` directory.
+After all the jobs finished (may take a while), it is time to collect the important data from each files in the `./raw_outputs` directory.
 
 ```
 - badirate_analysis/
@@ -247,9 +251,9 @@ This will collect 4 files in each branch model - replication group:
 
 ```{r, eval = FALSE}
 
-setup_table <- readr::write_csv("./setup_table.csv")
+setup_table <- readr::read_csv("../test/setup_table.csv")
 
-bd_collect(setup_table, out_dir = "./results")
+bd_collect(setup_table, out_dir = "../test/results")
 
 ```
 
@@ -300,7 +304,7 @@ best_models <- bd_model_select(setup_table = setup_table,
                                results_dir = "./results")
 
 
-readr::write_csv(best_models, "")
+readr::write_csv(best_models, "./analysis/best_models.csv")
 
 best_models
 ```
@@ -312,15 +316,21 @@ The output is tibble with one line per family, with the selected best model, its
 We can parse gain/loss events for each orthogroup from the best models.
 
 ```{r, eval = FALSE}
-bd_extract_gain(best_models = best_models, results_dir = "./results")
+gains <- bd_extract_gain(best_models = best_models, results_dir = "./results")
 
-bd_extract_gain
+gains
 ```
 
 Now we have most of the information on significant gain/loss events. 
 
-How to decode?
 
+***
 
+# Session Info {.unnumbered}
 
+This document was generated on the following system:
+
+```{r}
+devtools::session_info()
+```
 

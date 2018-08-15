@@ -1,0 +1,16 @@
+version : 0.46
+languages : %
+    C : C
+    PYTHON : Python
+    Python : Python
+    py : Python
+    python : Python
+types : %
+    C : compiled
+    Python : interpreted
+modules : %
+    C : Inline::C
+    Python : Inline::Python
+suffixes : %
+    C : bundle
+    Python : pydat

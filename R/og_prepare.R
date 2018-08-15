@@ -13,8 +13,12 @@
 split_orthogroups <- function(og_file, max_count = 40, og_path = "./badirate_orthogroups") {
 
 
-  ortho <- readr::read_tsv(og_file) %>%
+  ortho <- readr::read_tsv(og_file)
+
+  if ("Total" %in% names(ortho)) {
+    ortho <- ortho %>%
     dplyr::select(-Total)
+  }
 
   cat(paste("Found ", nrow(ortho), " orthogroups.", "\n", "Filtering...\n", sep = ""))
 
