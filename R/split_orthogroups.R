@@ -1,19 +1,17 @@
 #' Splitting and filtering orthogroups to individual files
 #'
 #' @param og_file Output from orthofinder (Orthogroups.GeneCount.csv) or similarly formatted count table.
-#' @param max_count
-#' @param og_path
+#' @param max_count Integer. Maximum number of genes per family/orthogroup per species.
+#' @param og_path Path to create the split files into.
 #'
 #' @return Null. Writes files to given path
 #'
 #' @import dplyr
-#' @importFrom readr read_tsv
-#' @importFrom readr write_tsv
-#' @importFrom utils setTxtProgressBar
-#' @importFrom utils txtProgressBar
+#' @importFrom readr read_tsv write_tsv
+#' @importFrom utils setTxtProgressBar txtProgressBar
+#'
 #' @export
 #'
-#' @examples
 split_orthogroups <- function(og_file, max_count = 40, og_path = "./badirate_orthogroups") {
 
 

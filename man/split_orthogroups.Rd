@@ -10,7 +10,9 @@ split_orthogroups(og_file, max_count = 40,
 \arguments{
 \item{og_file}{Output from orthofinder (Orthogroups.GeneCount.csv) or similarly formatted count table.}
 
-\item{og_path}{}
+\item{max_count}{Integer. Maximum number of genes per family/orthogroup per species.}
+
+\item{og_path}{Path to create the split files into.}
 }
 \value{
 Null. Writes files to given path

@@ -10,9 +10,9 @@
 #' @importFrom readr read_delim
 #' @importFrom purrr map
 #' @importFrom tidyr unnest
+#'
 #' @export
 #'
-#' @examples
 bd_extract_gain <- function(best_models, results_dir = "./results") {
 
   best_models %>%

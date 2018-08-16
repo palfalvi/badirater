@@ -10,10 +10,9 @@
 #' @importFrom purrr map_chr
 #' @importFrom stringr str_remove_all
 #' @importFrom treeio read.newick
-#' @importFrom datasets trees
+#'
 #' @export
 #'
-#' @examples
 bd_decode_tree_ids <- function(tree_id){
   tree <- treeio::read.newick(tree_id)
 

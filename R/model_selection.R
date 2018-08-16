@@ -10,9 +10,9 @@
 #' @importFrom stringr str_sub
 #' @importFrom purrr map
 #' @importFrom readr read_delim
+#'
 #' @export
 #'
-#' @examples
 bd_model_select <- function(setup_table, results_dir){
 
 dplyr::tibble(file_path = list.files(path = results_dir, pattern =  ".likelihood.txt")) %>%

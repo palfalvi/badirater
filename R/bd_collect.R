@@ -3,10 +3,12 @@
 #' @param setup_table Setup table created when `prepare_badirate_scripts()` was invited.
 #' @param out_dir Output directory to store result files.
 #'
-#' @return
+#' @return Null. Collects relevant informations in an organized manner.
+#'
+#' @importFrom utils setTxtProgressBar txtProgressBar
+#'
 #' @export
 #'
-#' @examples
 bd_collect <- function(setup_table, out_dir = "./results"){
 
   if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)

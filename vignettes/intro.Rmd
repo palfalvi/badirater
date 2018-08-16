@@ -332,6 +332,6 @@ Now we have most of the information on significant gain/loss events.
 This document was generated on the following system:
 
 ```{r}
-devtools::session_info()
+sessionInfo()
 ```
 

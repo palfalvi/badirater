@@ -11,6 +11,9 @@ bd_collect(setup_table, out_dir = "./results")
 
 \item{out_dir}{Output directory to store result files.}
 }
+\value{
+Null. Collects relevant informations in an organized manner.
+}
 \description{
 Collect results files from BadiRate runs.
 }
