@@ -15,7 +15,7 @@
 #'
 bd_branch_numbers <- function(tree, og = "./Orthogroups.GeneCount.csv", badirate_path = "", plot = FALSE, tree_file = "./branch_ids.tree") {
 
-  tree_id <- system(command = paste0("perl ", badirate_path, "BadiRate.pl -print_ids -treefile ", tree, " -sizefile ", og), wait = TRUE, inter = TRUE)[2]
+  tree_id <- system2(command = "perl", args = paste0(badirate_path, "BadiRate.pl -print_ids -treefile ", tree, " -sizefile ", og), wait = TRUE, stdout = TRUE)[2]
   readr::write_file(x = tree_id, path = tree_file)
 
   if (plot){

@@ -20,6 +20,8 @@ prepare_badirate(og_path, tree, branch_models = c(gr = "GR", fr = "FR",
 
 \item{rate_model}{Rate model. Deafult is GD.}
 
+\item{estimation}{Estimation method used for BadiRate. Default is ML.}
+
 \item{out_dir}{Output directory for the future runs.}
 
 \item{script_dir}{Directory which the script files should be saved.}

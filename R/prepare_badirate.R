@@ -4,6 +4,7 @@
 #' @param tree Path to ultrametric species tree file. Leaf names have to match to orthogroup header names.
 #' @param branch_models Vector of named branch models. Name should be a 2-letter abbreviation of choice (except gr and fr, which are specific). Value should be either "GR", "FR" or a specific branch model in the syntax of badirate (e.g. "13->14:13->15_18->21"). *CAUTION: More complex models can increase running time drastically.*
 #' @param rate_model Rate model. Deafult is GD.
+#' @param estimation Estimation method used for BadiRate. Default is ML.
 #' @param out_dir Output directory for the future runs.
 #' @param script_dir Directory which the script files should be saved.
 #' @param replicates How many replications per model. Default is 2. *CAUTION: Big number of replicates can drastically extend runtime*
