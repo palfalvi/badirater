@@ -2,10 +2,11 @@ Package: badirater
 Type: Package
 Title: Helper functions to run and process BadiRate analysis in whole-genome scale
 Version: 0.0.0.9000
-Authors@R: person("Gergo", "Palfalvi", role = c("aut", "cre"), email = "palfalvi.gergo@gmail.com")
+Authors@R: person("Gergo", "Palfalvi", role = c("aut", "cre"), email = "palfalvi.gergo@gmail.com", url = "htpps://palfalvi.org")
 Maintainer: Gergo Palfalvi <palfalvi.gergo@gmail.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
+URL: https://palfalvi.github.io/badirater
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -22,3 +23,4 @@ Suggests: BiocStyle,
     testthat
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0
+BugReports: https://github.com/palfalvi/badirater/issues

@@ -78,7 +78,7 @@ prepare_badirate <- function(og_path,
               " -sizefile ./${file}",
               ifelse(ancestral, " -anc", ""),
               ifelse(outlier, " -outlier", ""),
-              " -out ../", out_dir, "/", names(branch_models[i]), "/${file}.gr`printf '%02d' ${PBS_ARRAY_INDEX}`.bd", "\n\n",
+              " -out ../", out_dir, "/", names(branch_models[i]), "/${file}.", names(branch_models[i]), "`printf '%02d' ${PBS_ARRAY_INDEX}`.bd", "\n\n",
               "done",sep = ""),
         paste(script_dir, "/badi_", names(branch_models[i]), "_script.pbs", sep = "")
       )
@@ -108,7 +108,7 @@ prepare_badirate <- function(og_path,
               " -sizefile ./${file}",
               ifelse(ancestral, " -anc", ""),
               ifelse(outlier, " -outlier", ""),
-              " -out ../", out_dir, "/", names(branch_models[i]), "/${file}.gr`printf '%02d' ${SLURM_ARRAY_TASK_ID}`.bd", "\n\n",
+              " -out ../", out_dir, "/", names(branch_models[i]), "/${file}.", names(branch_models[i]), "`printf '%02d' ${SLURM_ARRAY_TASK_ID}`.bd", "\n\n",
               "done",sep = ""),
         paste(script_dir, "/badi_", names(branch_models[i]), "_script.slurm", sep = "")
       )

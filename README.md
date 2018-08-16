@@ -20,4 +20,4 @@ devtools::install_github("palfalvi/badirater")
 Usage
 -----
 
-For detailed usage please refer to the `vignettes` page.
+For detailed usage please refer to the [this website](https://palfalvi.github.io/badirater/).
