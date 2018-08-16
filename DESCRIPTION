@@ -1,7 +1,7 @@
 Package: badirater
 Type: Package
 Title: Helper functions to run and process BadiRate analysis in whole-genome scale
-Version: 0.1.0
+Version: 0.0.0.9000
 Author: Gergo Palfalvi
 Maintainer: Gergo Palfalvi <palfalvi.gergo@gmail.com>
 Description: More about what it does (maybe more than one line)
