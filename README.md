@@ -21,3 +21,8 @@ Usage
 -----
 
 For detailed usage please refer to the [this website](https://palfalvi.github.io/badirater/).
+
+Citation
+--------
+
+If you use this package, please cite: https://doi.org/10.1016/j.cub.2020.04.051
